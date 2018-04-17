@@ -1,0 +1,97 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+
+ALL_BROWSERS = ['Firefox',
+                'Chrome']
+
+ALL_SITES = ['http://www.yahoo.com',
+             'https://www.google.com',
+             'https://www.banana.by',
+             'https://www.tut.by',
+             'https://www.wikipedia.org']
+
+LOGIN = 'kuzia1239616@gmail.com'
+PASSWORD = 'antonhmarun'
+
+
+def find_alexander_solodukha(browser, address):
+    if browser == 'Firefox':
+        driver = webdriver.Firefox()
+    elif browser == 'Chrome':
+        driver = webdriver.Chrome()
+    else:
+        print('undefined browser {}'.format(browser))
+        return
+
+    driver.get(address)
+    if address == 'http://www.yahoo.com':
+        assert 'Yahoo' in driver.title
+        elem = driver.find_element_by_name('p')
+    elif address == 'https://www.google.com':
+        assert 'Google' in driver.title
+        elem = driver.find_element_by_name('q')
+    elif address == 'https://www.banana.by':
+        elem = driver.find_element_by_name('story')
+    elif address == 'https://www.tut.by':
+        elem = driver.find_element_by_name('str')
+    elif address == 'https://www.wikipedia.org':
+        assert 'Wikipedia' in driver.title
+        elem = driver.find_element_by_name('search')
+    else:
+        print('undefined site {}'.format(address))
+        return
+
+    elem.send_keys("Alexander Solodukha")
+    elem.send_keys(Keys.RETURN)
+    assert "No results found." not in driver.page_source
+    time.sleep(5)
+    driver.close()
+
+def solodukhas_followers(browser):
+    if browser == 'Firefox':
+        driver = webdriver.Firefox()
+    elif browser == 'Chrome':
+        driver = webdriver.Chrome()
+    else:
+        print('undefined browser {}'.format(browser))
+        return
+
+    driver.get('https://twitter.com/solodukha')
+    element = driver.find_element_by_xpath("//a[@data-nav='followers']/span[@class='ProfileNav-value']")
+    followers = element.get_attribute('data-count')
+    with open('followers.txt', 'a') as file_object:
+        file_object.write("[{}] - {} - {}\n".format(time.strftime("%m/%d/%Y %I:%M %p"), browser, followers))
+    driver.close()
+
+def autologer_google(browser):
+    if browser == 'Firefox':
+        driver = webdriver.Firefox()
+    elif browser == 'Chrome':
+        driver = webdriver.Chrome()
+    else:
+        print('undefined browser {}'.format(browser))
+        return
+
+    driver.get('https://mail.google.com')
+    elem_login = driver.find_element_by_name('identifier')
+    elem_login.send_keys(LOGIN)
+    elem_login.send_keys(Keys.RETURN)
+    time.sleep(3)
+    elem_password = driver.find_element_by_name('password')
+    elem_password.send_keys(PASSWORD)
+    elem_password.send_keys(Keys.RETURN)
+    time.sleep(5)
+    driver.close()
+
+
+for browser in ALL_BROWSERS:
+    for site in ALL_SITES:
+        find_alexander_solodukha(browser, site)
+
+
+for browser in ALL_BROWSERS:
+    solodukhas_followers(browser)
+
+for browser in ALL_BROWSERS:
+    autologer_google(browser)
